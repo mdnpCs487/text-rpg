@@ -52,14 +52,25 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         Random rand = new Random();
         
         //GAME VARIABLES
-        String[] enemies = { "Skeleton", "Zombie", "Elf", "Brother Fan the Chad Elf","SANS?!" };
+        String[] enemies = { "Skeleton", "Zombie", "Elf", "Kobold", "Goblin", "Slime", "Bird", "Turtle", "Cat", "Money Bear", "XP Bear"  };
+        String[] bossEnemies = { "Brother Fan the Chad Elf", "SANS?!" };
         int maxEnemyHealth = 75;
         int enemyAttackDamage = 25;
         int eneLevel = 1;
         int depth = 0;
         int floor = 1;
         
+        int moneyGained = 0;
         
+        int bonusMoney = 0;
+        
+        double bonusXP = 0;
+        
+        boolean chargebnsdmg = false;
+        boolean showbnsdmg = false;
+        
+        String enemy = "";
+        String bossEnemy = "";
         
         //ASCII_ART CLASS LOAD
         ASCII_Art arts = new ASCII_Art();
@@ -101,17 +112,22 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         int charge = 1;
         int chargeDmg = 0;
         
+        double MonXP = 0;
+        
+        String cDmgNum = "";
+        String addedDamage = " +("+cDmgNum+")";
         // int health = 100;
-        int attackDamage = 50+5000;//DEBUG DAMAGE
+        int attackDamage = 50;//DEBUG DAMAGE
         int mindamage = 1;
         int numHealthPots = 3;
         int money = 0;
-        int moneyDrop = 50;
+        int moneyDrop = 75;
         int healthPotionHealAmount = 30;
         int healthPotionDropChance = 50; //Percentage
         //XP
         int plyLevel = 0;
         double XP = 0;
+        double displayXP = 0;
         double nextlvXP = 50;
         //BOSS VARIABLES
         int SansHealth = 1;
@@ -131,14 +147,14 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         
         
         while(mainmenu) {                                                                       // MAIN MENU!!!!! 
-        System.out.println("=========================");
-        System.out.println("\tWelcome to the dungeon.\n");
-        System.out.println("1. Explore the dungeon");
-        System.out.println("2. Exit");
-        System.out.println("=========================");
+        System.out.println("||===============================================||");
+        System.out.println("\t Welcome to the dungeon.\n");
+        System.out.println("\t1. Explore the dungeon");
+        System.out.println("\t2. Exit");
+        System.out.println("||===============================================||");
         String inputMenu = in.nextLine();
         if(inputMenu.equals("1")){
-            System.out.println("\n\n\n\n\n\n\n\n\n\n");
+            System.out.println("\n\n\n\n");
             
             mainmenu = false;
             break;
@@ -156,8 +172,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         boolean load = false;
         GAME:
         while(running) {                                                                            //GAME START !!!!!
-           if(load == false) {
-            System.out.println("###\nLOAD SAVE??? 1/0\n###");
+           
+            
+            if(load == false) {
+            System.out.println("##################\nLOAD SAVE??? 1/0\n##################");
             String inpsave = in.nextLine();
             if(inpsave.equals("1")) {
                 try {
@@ -170,8 +188,30 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
 
 		// get the property value and print it out
 		System.out.println(prop.getProperty("savedmonvalue"));
+                
                 int moneyloaded = Integer.parseInt(prop.getProperty("savedmonvalue"));
                 money = moneyloaded;
+                
+                int healthpotloaded = Integer.parseInt(prop.getProperty("savednumHealthPots"));
+                numHealthPots = healthpotloaded;
+                
+                int plylvloaded = Integer.parseInt(prop.getProperty("savedplyLevel"));
+                plyLevel = plylvloaded;
+                
+                int attackdamageloaded = Integer.parseInt(prop.getProperty("savedattackDamage"));
+                attackDamage = attackdamageloaded;
+                
+               int eadamageloaded = Integer.parseInt(prop.getProperty("savedEAdmg"));
+               equipadddamage = eadamageloaded;
+                
+               int maxhealthloaded = Integer.parseInt(prop.getProperty("savedmaxHealth"));
+               maxHealth = maxhealthloaded;
+                
+               double xploaded = Double.parseDouble(prop.getProperty("savedXP"));
+               XP = xploaded;
+               
+               double displayxploaded = Double.parseDouble(prop.getProperty("saveddisplayXP"));
+               displayXP = displayxploaded;
                 
 		//System.out.println(prop.getProperty("dbuser"));
 		//System.out.println(prop.getProperty("dbpassword"));
@@ -187,9 +227,15 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
 			}
 		}
 	}
-                System.out.println("###########\nCONTINUED LAST SAVE\n###########");
+                System.out.println("######################\nCONTINUED LAST SAVE\n######################");
                 load = true;
-            } else {
+            } else if(inpsave.equals("0")){
+                System.out.println("");
+                load = true;
+                
+            }
+            
+            else {
                 continue;
             }
            }
@@ -201,16 +247,78 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
             
             int curenemyHealth = rand.nextInt(maxEnemyHealth);
             int enemyHealth = curenemyHealth;
-            String enemy = enemies[rand.nextInt(enemies.length)];
             
-            System.out.println("\t# " +enemy +" has appeared! #\n");
+           
+            
+            
             //BOOLEANS
             boolean Boss = false;
             boolean SansFight = false;
             boolean ChadFight = false;
             
-            //SANS?! ENCOUNTER DATA
-            if(enemy.equals("SANS?!")){
+            if(floor%5!=0 ) {
+            enemy = enemies[rand.nextInt(enemies.length)];
+                switch (enemy) {
+                    case "Money Bear":
+                        {
+                            System.out.println("\t# " +enemy +" has appeared! #\n");
+                            Boss = false;
+                            eneLevel = 1+floor/2;
+                            maxEnemyHealth = 75+(plyLevel)+(eneLevel*2);
+                            curenemyHealth = rand.nextInt(maxEnemyHealth);
+                            enemyHealth = curenemyHealth;
+                            enemyAttackDamage = 25+(1*(plyLevel/2));
+                            enemyAttackDamage = 1+(eneLevel+rand.nextInt(enemyAttackDamage));
+                            double dblplyLevel = plyLevel; //CONVERT INT TO DOUBLE
+                            enemyHit = 50;
+                            enemyEva = 112;
+                            bonusMoney = 400;
+                            break;
+                        }
+                    case "XP Bear":
+                        {
+                            System.out.println("\t# " +enemy +" has appeared! #\n");
+                            Boss = false;
+                            eneLevel = 1+floor/2;
+                            maxEnemyHealth = 155+(plyLevel)+(eneLevel*2);
+                            curenemyHealth = rand.nextInt(maxEnemyHealth);
+                            enemyHealth = curenemyHealth;
+                            enemyAttackDamage = 25+(1*(plyLevel/2));
+                            enemyAttackDamage = 1+(eneLevel+rand.nextInt(enemyAttackDamage));
+                            double dblplyLevel = plyLevel; //CONVERT INT TO DOUBLE
+                            enemyHit = 66;
+                            enemyEva = 66;
+                            bonusMoney = 0;
+                            bonusXP = maxEnemyHealth*2.5;
+                            break;
+                        }
+                    default:
+                        {
+                            
+                            System.out.println("\t# " +enemy +" has appeared! #\n");
+                            //NORMAL ENEMIES DATA
+                            Boss = false;
+                            eneLevel = 1+floor/2;
+                            maxEnemyHealth = 100+(plyLevel)+(eneLevel*2);
+                            curenemyHealth = rand.nextInt(maxEnemyHealth);
+                            enemyHealth = curenemyHealth;
+                            enemyAttackDamage = 25+(1*(plyLevel/2));
+                            enemyAttackDamage = 1+(eneLevel+rand.nextInt(enemyAttackDamage));
+                            double dblplyLevel = plyLevel; //CONVERT INT TO DOUBLE
+                            enemyHit = 50;
+                            enemyEva = 55;
+                            bonusMoney = 0;
+                            bonusXP = 0;
+                            break;
+                        }
+                }
+            } else if(floor%5==0 ) {
+                
+            bossEnemy = bossEnemies[rand.nextInt(bossEnemies.length)];
+            System.out.println("\t# " +bossEnemy +" has appeared! #\n");
+                
+                //SANS?! ENCOUNTER DATA
+            if(bossEnemy.equals("SANS?!")){
                 Boss = true;
                   eneLevel = 1;
                   curenemyHealth = SansHealth;
@@ -220,11 +328,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                   enemyHit = enemyHit + SansHit;
                   
                   maxEnemyHealth = maxEnemyHealth - maxEnemyHealth + 1;
-                  
+                  bonusMoney = 3000;
                 } 
             
             //SPECIAL CHAD ELF ENCOUNTER DATA
-            else if(enemy.equals("Brother Fan the Chad Elf")){
+            else if(bossEnemy.equals("Brother Fan the Chad Elf")){
                 Boss = true;
                   eneLevel = 70;
                   curenemyHealth = ChadHealth;
@@ -234,22 +342,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                   enemyHit = enemyHit + ChadHit;
                   
                   maxEnemyHealth = maxEnemyHealth - maxEnemyHealth + 1000;
+                  bonusMoney = 3000;
                   
-                  //NORMAL ENEMIES DATA
-                } else {
-                Boss = false;
-                eneLevel = 1+floor/2;
-                maxEnemyHealth = 100+(plyLevel)+(eneLevel*2);
-                curenemyHealth = rand.nextInt(maxEnemyHealth);
-                enemyHealth = curenemyHealth;
-                enemyAttackDamage = 25+(1*(plyLevel/2));
-                enemyAttackDamage = 1+(eneLevel+rand.nextInt(enemyAttackDamage));
-                double dblplyLevel = plyLevel; //CONVERT INT TO DOUBLE
-                enemyHit = 50;
-                enemyEva = 55;
-                
-                
+                }
             }
+            
             
             
             while(enemyHealth > 0) {
@@ -268,21 +365,25 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
             enemyHitPercent = 100;
         }
                 //SANS SPRITE ENCOUNTER IN LOOP
-                if(enemy.equals("SANS?!")){
+                if(bossEnemy.equals("SANS?!")){
                     System.out.println("");
                     String PrintSans = arts.printSans();                    
                     System.out.println("");
 
                 } 
                 //CHAD ELF SPRITE ENCOUNTER IN LOOP
-                if(enemy.equals("Brother Fan the Chad Elf")){
+                if(bossEnemy.equals("Brother Fan the Chad Elf")){
                     System.out.println("");
                     String PrintChad = arts.printChad(); //calls the method printChad() from ASCII_Art.    
                     System.out.println("");
 
                 } 
                 
-                
+                if(floor%5==0 ) {
+                    enemy = bossEnemy;
+                } else {
+                    enemy = enemy;
+                }
               
                 System.out.println("------------------------------------");
                 System.out.println("\tYour HP: " +health);
@@ -316,8 +417,8 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     //SCREEN JUMP TO CLEAN
                     
                     
-                    System.out.println("\n\n\n\n\n\n\n\n\n\n");
-                    System.out.println("------------------------------------");
+                    //System.out.println("\n\n\n\n\n\n\n\n\n\n");
+                    //System.out.println("------------------------------------");
                     
                     int damageDealt = mindamage+equipadddamage+rand.nextInt(attackDamage);
                     int damageDealtCharged = mindamage+equipadddamage+rand.nextInt(attackDamage+chargeDmg);
@@ -333,17 +434,23 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     double plyrange = plyMax - plyMin + 0.01;
                     //Evasion randomizer or chance
                     double eneRandEva = (double)(Math.random()) + eneMin;
+                    double plyRandEva = (double)(Math.random()) + plyMin; //double math random is going to roll random number from 0-1, but since it's multiplied by plyrange, which is -> 
+                    
                     
                     System.out.println("1. Attack");
                     System.out.println("2. Charge up Power");
                     System.out.println("3. Charge Attack");
+                    System.out.println("------------------------------------");
+                    
                     String inpAtk = in.nextLine();
+                    
                     if(inpAtk.equals("1")){
                          
                         if(eneRandEva >= possEnemyNotGetHit) {
                         eneRandEva = possEnemyNotGetHit;
                         
                         enemyHealth -= damageDealt;
+                        System.out.println("\n\n\n\n\n\n\n\n\n\n");
                         System.out.println("\t> You hit the enemy!");       
                        // new DecimalFormat("$#.00").format(eneRandEva);
                         df2.setRoundingMode(RoundingMode.UP);
@@ -353,11 +460,12 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     } else {
                         enemyHealth = enemyHealth + 0;
                         df2.setRoundingMode(RoundingMode.UP);
+                        System.out.println("\n\n\n\n\n\n\n\n\n\n");
                         System.out.println("\t> Your attack missed the enemy!");
                        // System.out.println("\t> The enemy evaded the attack!");System.out.println("(debug) chance : " +df2.format(eneRandEva));
-                       
+                        }
                        //Evasion randomizer or chance
-                    double plyRandEva = (double)(Math.random()) + plyMin; //double math random is going to roll random number from 0-1, but since it's multiplied by plyrange, which is -> 
+                    plyRandEva = (double)(Math.random()) + plyMin;
                     if(plyRandEva >= possPlyNotGetHit) {
                         plyRandEva = possPlyNotGetHit;
                         
@@ -375,21 +483,47 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                        // System.out.println("\t> You evaded the "+enemy +"'s attack!"); System.out.println("(debug) chance : "+df2.format(plyRandEva));
                         //You evaded!
                     }
-                   }    
+                       
                         
                   } else if(inpAtk.equals("2")){
+                      chargebnsdmg = true;
+                      System.out.println("------------------------------------");
                       System.out.println("\t> You charge up power inside.");
                      
                       charge += 1;
                       System.out.println("\t> Charge Level : "+charge);
                       boolean charged = true;
                        
-                      chargeDmg = attackDamage * charge;
                       
-                      String cDmgNum = Integer.toString(chargeDmg);
-                      System.out.println("\t> You charged up +"+(chargeDmg-attackDamage)+" max damage!");
+                      chargeDmg =(int) ((attackDamage * charge) - attackDamage)/2;
                       
+                      cDmgNum = Integer.toString(chargeDmg);
+                      
+                      addedDamage = " +("+cDmgNum+")";
+                      System.out.println("\t> You charged up +"+(chargeDmg)+" max damage!");
+                      
+                      //Evasion randomizer or chance
+                    plyRandEva = (double)(Math.random()) + plyMin; //double math random is going to roll random number from 0-1, but since it's multiplied by plyrange, which is -> 
+                    if(plyRandEva >= possPlyNotGetHit) {
+                        plyRandEva = possPlyNotGetHit;
+                        
+                        health -= damageTaken;
+                        System.out.println("\t> The " +enemy +" hits you!");
+                        new DecimalFormat("$#.00").format(plyRandEva);
+                        df2.setRoundingMode(RoundingMode.UP);
+                       // System.out.println("(debug) chance : "+df2.format(plyRandEva));
+                        System.out.println("\t> You receive " +damageTaken +" damage!");
+                        //the monster hit you!
+                    } else {
+                        health = health + 0;
+                        df2.setRoundingMode(RoundingMode.UP);
+                        System.out.println("\t> The " +enemy +" missed it's attack!");
+                       // System.out.println("\t> You evaded the "+enemy +"'s attack!"); System.out.println("(debug) chance : "+df2.format(plyRandEva));
+                        //You evaded! 
+                    }
+                    
                   } else if(inpAtk.equals("3")){
+                      chargebnsdmg = false;
                       charge = 1;
                       boolean charged = false;
                       if(eneRandEva >= possEnemyNotGetHit) {
@@ -409,7 +543,7 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                        // System.out.println("\t> The enemy evaded the attack!");System.out.println("(debug) chance : " +df2.format(eneRandEva));
                        
                        //Evasion randomizer or chance
-                    double plyRandEva = (double)(Math.random()) + plyMin; //double math random is going to roll random number from 0-1, but since it's multiplied by plyrange, which is -> 
+                    plyRandEva = (double)(Math.random()) + plyMin; //double math random is going to roll random number from 0-1, but since it's multiplied by plyrange, which is -> 
                     if(plyRandEva >= possPlyNotGetHit) {
                         plyRandEva = possPlyNotGetHit;
                         
@@ -466,12 +600,24 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         String SansSystem = SansDialogues[rand.nextInt(SansDialogues.length)];
                         System.out.println(SansSystem);
                     }
+                    
+                    if(chargebnsdmg!=true) {
+                        showbnsdmg = false;
+                    } else {
+                        showbnsdmg = true;
+                    }
+                    
+                    if(showbnsdmg!=true){
+                        addedDamage = "";
+                    }
+                    
+                    
                     System.out.println("-----------------------------------------------------------");
                     System.out.println("                      FLOOR " +floor +", DEPTH " +depth);
                     System.out.println("-----------------------------------------------------------");
                     System.out.println("Ply LV  : " +plyLevel);
                     System.out.println("Ply HP  : " +health +"/" +maxHealth);
-                    System.out.println("Ply DMG : " +(mindamage+equipadddamage)+"-"+(attackDamage+equipadddamage));
+                    System.out.println("Ply DMG : " +(mindamage+equipadddamage)+"-"+(attackDamage+equipadddamage)+addedDamage);
                    // new DecimalFormat("$#.00").format(plyHitPercent);
                    df2.setRoundingMode(RoundingMode.UP);
                     System.out.println("Ply HIT : " +plyHit +"("+df2.format(plyHitPercent)+"% chance to hit enemy.)");
@@ -534,7 +680,7 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                                             +"\n\t> You now have " +health + "HP"
                                             +"\n\t> You have " + numHealthPots +" health potions left.\n");
                         //System.out.println("\n\n\n\n\n\n\n\n\n\n");
-                        System.out.println("\n\n\n\n\n\n\n\n\n\n");
+                        System.out.println("\n\n");
                         continue INVENTORY;
                     }
                     
@@ -554,6 +700,9 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 }
             } //while(enemyhealth > 0) END
            
+            //call art if depth 13
+            
+            
             if(health<1){
                 System.out.println("");
                 System.out.println("You limp out of the dungeon, weak from battle");
@@ -561,11 +710,45 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 
             }
             
-            double MonXP = (eneLevel*3) + rand.nextInt(maxEnemyHealth) * 0.15;                                // EXPERIENCE FORMULAS
+            MonXP = ((eneLevel*3) + rand.nextInt(maxEnemyHealth) * 0.25)+bonusXP;                                // EXPERIENCE FORMULAS
             XP = XP + MonXP;
                                 
-                            
-                        
+            for(nextlvXP = nextlvXP;nextlvXP<=XP;plyLevel++){
+                
+                maxHealth = maxHealth + 2;
+                attackDamage = attackDamage +5;
+                //plyLevel = plyLevel +1;
+                nextlvXP = nextlvXP + nextlvXP * 1.15;
+               
+                System.out.println("\n\n");                     
+                System.out.println("************************");                 
+                System.out.println("--> You leveled up to lv "+(plyLevel+1) +"! <--");
+                System.out.println("--> HP +"+"2!");
+                System.out.println("--> MAX DMG +"+"5!");
+                System.out.println("************************");
+                
+                double roundoff1 = Math.round(nextlvXP*100)/100;
+                System.out.println(+(int)nextlvXP +" XP left to level up!");
+                
+                
+                XP = XP - nextlvXP;
+                
+                
+            } if(XP<=nextlvXP){
+                displayXP = displayXP+MonXP;
+                double nextlvxp = nextlvXP - XP;
+                System.out.println("\n");
+            System.out.println("------------------------------------");
+            System.out.println(" # " +enemy +" was defeated! # ");
+            System.out.println("");
+            System.out.println(" # You gained " +MonXP +" XP! #");
+            System.out.println("");
+            System.out.println(" # Total XP : "+displayXP +" XP #");
+            System.out.println("");
+           System.out.println(" # " +(int)nextlvxp +" XP left to level up!" +" #");
+           System.out.println("");
+            }                
+              /*          
             if(XP >= nextlvXP) {
                 System.out.println("\n\n\n\n\n\n\n\n\n\n");                     
                 System.out.println("************************");                 
@@ -595,11 +778,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
            System.out.println("");
             
             }
-            
+            */
             System.out.println(" # You have " +health +"/"+maxHealth +" HP # ");
             System.out.println("");
            
-            int moneyGained = rand.nextInt(moneyDrop);            //MONEY DROP
+            moneyGained = rand.nextInt(moneyDrop+bonusMoney);            //MONEY DROP
                 money = money + moneyGained;
                 System.out.println(" # The " +enemy  +" dropped " +moneyGained +" Coins! #");
                 System.out.println("");
@@ -612,14 +795,19 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 System.out.println(" # You have " +numHealthPots + " health potions! #");
                                 
             }
-            
            
+            if(depth==28){
+                System.out.println("\n\nTHANK YOU FOR PLAYING THE DARKRPG ALPHA DEMO!!!");
+                System.out.println("");
+                running = false;
+            }
+            BACK:
             System.out.println("------------------------------------");
             System.out.println("What would you like to do?");
             System.out.println("1. Continue Fighting");
             System.out.println("2. Exit Dungeon?");
             System.out.println("3. Shop");
-            System.out.println("4. Save");
+            System.out.println("4. Save & Continue Fighting");
             System.out.println("------------------------------------");
             
             String input = in.nextLine();
@@ -631,6 +819,7 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
             
             if(input.equals("1")) {                                             //CONTINUE VENTURES
                 depth = depth +1;                                             // DEPTH & FLOOR
+                            System.out.println("\n\n\n\n\n\n\n\n\n\n");
                             System.out.println("\t*********************************");
                             System.out.println("\t You went further in the dungeon.");
                             System.out.println("\t*********************************");
@@ -639,7 +828,22 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                             if(depth % 3 == 0){
                                 floor = floor +1;
                             
-                        }
+                        } else if(depth==13 ) {
+                            System.out.println("You've killed the boss and reached the end content of the alpha demo version.\nEnter Y to end the demo, N to keep diving.");
+                            System.out.println("End demo? Y/N");
+                            String confirm = in.nextLine();
+                            confirm = confirm.toUpperCase();
+                            if(confirm.equals("Y")){
+                                
+                                String printThanks = arts.printThank();
+                                running = false;
+                             
+                            } else if(confirm.equals("N")){
+                                continue;
+                            }
+                            
+                
+            }
                continue;
             }
             else if(input.equals("2")) {                                        //STOP GAME
@@ -802,14 +1006,43 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 
             }           
             else if(input.equals("4")) {
-                System.out.println("###########\nYou saved your progress!\n###########");
+                
+                System.out.println("\n\n\n\n\n\n\n\n\n\n");  
+                System.out.println("##########################\nYou saved your progress!\n##########################");
                 try {
-                    
+           //cheat save system lul         
            //set properties values to prop
            String savedmoney = Integer.toString(money);
-           
            prop.setProperty("savedmonvalue",savedmoney);
-           prop.setProperty("test","test2");
+           
+           String savedplyLevel = Integer.toString(plyLevel);
+           prop.setProperty("savedplyLevel", savedplyLevel);
+           
+           String savedEAdmg = Integer.toString(equipadddamage);
+           prop.setProperty("savedEAdmg", savedEAdmg);                  
+           
+           String savedXP = Double.toString(XP);
+           prop.setProperty("savedXP", savedXP);
+           
+           String savedmaxHealth = Integer.toString(maxHealth);
+           prop.setProperty("savedmaxHealth", savedmaxHealth);
+           
+           String savednumHealthPots = Integer.toString(numHealthPots);
+           prop.setProperty("savednumHealthPots", savednumHealthPots);                      
+           
+           String savedattackDamage = Integer.toString(attackDamage);
+           prop.setProperty("savedattackDamage", savedattackDamage);
+           
+           String saveddisplayXP = Double.toString(displayXP);
+           prop.setProperty("saveddisplayXP", saveddisplayXP);
+           
+           //String savednextlvXP = Double.toString(nextlvXP);
+           //prop.setProperty("savednextlvXP", savednextlvXP);
+           
+           //String savedMonXP = Double.toString(MonXP);
+           //prop.setProperty("savedMonXP", savedMonXP);
+           
+           //prop.setProperty("test","test2");
            
            //save properties to file
            prop.store(new FileOutputStream("DarkRPGsave.properties"), null);
