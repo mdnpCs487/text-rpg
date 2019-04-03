@@ -25,14 +25,21 @@ package TextRPG;
  *
  * @author asus
  */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.math.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 //import java.util.Random
 public class DarkRPG {
 
-
+    
+    private AudioPlay au;
+    
     
 private static DecimalFormat df2 = new DecimalFormat(".##");
    
@@ -43,6 +50,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
     
    
     public static void main(String[] args) {
+        //Audio files
+        //testSound2 audio = new testSound2();
+        
+        AudioPlay audioP = new AudioPlay();
+        Other oth1 = new Other(audioP, audioP.f);
         //Properties related
         Properties prop = new Properties();
         InputStream inputS = null;
@@ -107,9 +119,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         
         
         //Player Variables
-        int maxHealth = 100;
+        String name;
+        String myName = null;
+        int maxHealth = 1000;
         int health = maxHealth;
-        int charge = 1;
+        int charge = 0;
         int chargeDmg = 0;
         
         double MonXP = 0;
@@ -131,7 +145,9 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         double nextlvXP = 50;
         //BOSS VARIABLES
         int SansHealth = 1;
-        int SansAtkDmg = 1;
+        int SansAtkDmg = 50;
+        int SansStamina = 100;
+        
         double SansEva = 1000;
         double SansHit = 1000;
         
@@ -142,19 +158,80 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         
         
         boolean mainmenu = true;
+        boolean mainmenu2 = true;
         boolean running = true;
         
         
         
         while(mainmenu) {                                                                       // MAIN MENU!!!!! 
+        
+            //
+            //String filepath = "BruhSoundEffect.wav";
+            //audio.playMusic(filepath);
+            
+            //
+        System.out.println("\tWhat...is your name, traveller?");
+        myName = in.nextLine();
+        if(myName.equals("isekaimc")) {
+            maxHealth = 99999;
+            mindamage = 999;
+            attackDamage = 9999;
+            plyEva = 9999;
+            plyHit = 9999;
+            plyLevel = 9999;
+            
+            System.out.println("\tAh");
+            try{
+    TimeUnit.MILLISECONDS.sleep((2250));
+    }
+    catch (Exception ex) {
+        
+    } 
+            System.out.println("\tThe overpowered isekai mc");
+            
+            try{
+    TimeUnit.MILLISECONDS.sleep((1500));
+    }
+    catch (Exception ex) {
+        
+    }
+            
+            System.out.println("\tWell ok then unreasonable amount of stats and health for you");
+            try{
+    TimeUnit.MILLISECONDS.sleep((1750));
+    System.out.println("\n\n\n\n\n\n\n\n\n\n");
+    System.out.println("\n\n\n\n\n\n\n\n\n\n");
+    }
+    catch (Exception ex) {
+        
+    }
+            
+        } 
+            
+        
+        System.out.println("\n\n\n\n\n\n\n\n\n\n");
+        System.out.println("\n\n\n\n\n\n\n\n\n\n");
+        audioP.playSoundloop(1);
+        
+        
         System.out.println("||===============================================||");
         System.out.println("\t Welcome to the dungeon.\n");
         System.out.println("\t1. Explore the dungeon");
         System.out.println("\t2. Exit");
         System.out.println("||===============================================||");
+        
+        MAINMENU: 
+        while(mainmenu2) {
+        
         String inputMenu = in.nextLine();
+        
+               
         if(inputMenu.equals("1")){
             System.out.println("\n\n\n\n");
+            audioP.playSound(0);
+            
+            //au.stopSound();
+            
             
             mainmenu = false;
             break;
@@ -163,9 +240,16 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         } 
         
         else if(inputMenu.equals("2")){
+            audioP.stopSound();
+            audioP.playSound(1);
             running = false;
             break;
             
+            
+        } else {
+            System.out.println("Invalid Command");
+            continue MAINMENU;
+        }
         }
         }
         
@@ -176,10 +260,18 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
             
             if(load == false) {
             System.out.println("##################\nLOAD SAVE??? 1/0\n##################");
+            System.out.println("DON'T ENTER 1 IF YOU'VE NOT SAVED.");
             String inpsave = in.nextLine();
             if(inpsave.equals("1")) {
                 try {
-
+                audioP.stopSound();
+                audioP.playSound(1);    
+                audioP.stopSoundloop();
+                //
+                
+                //    
+                  
+                    
 		inputS = new FileInputStream("DarkRPGsave.properties");
 
 		// load a properties file
@@ -227,15 +319,21 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
 			}
 		}
 	}
+                System.out.println("\n\n\n\n\n\n\n\n\n\n");
                 System.out.println("######################\nCONTINUED LAST SAVE\n######################");
                 load = true;
             } else if(inpsave.equals("0")){
+                audioP.stopSound();
+                audioP.playSound(1); 
+                audioP.stopSoundloop();
                 System.out.println("");
                 load = true;
+                System.out.println("\n\n\n\n\n\n\n\n\n\n");
                 
             }
             
             else {
+                
                 continue;
             }
            }
@@ -263,6 +361,7 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         {
                             System.out.println("\t# " +enemy +" has appeared! #\n");
                             Boss = false;
+                            enemy=enemy;
                             eneLevel = 1+floor/2;
                             maxEnemyHealth = 75+(plyLevel)+(eneLevel*2);
                             curenemyHealth = rand.nextInt(maxEnemyHealth);
@@ -279,6 +378,7 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         {
                             System.out.println("\t# " +enemy +" has appeared! #\n");
                             Boss = false;
+                            enemy=enemy;
                             eneLevel = 1+floor/2;
                             maxEnemyHealth = 155+(plyLevel)+(eneLevel*2);
                             curenemyHealth = rand.nextInt(maxEnemyHealth);
@@ -298,6 +398,7 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                             System.out.println("\t# " +enemy +" has appeared! #\n");
                             //NORMAL ENEMIES DATA
                             Boss = false;
+                            enemy=enemy;
                             eneLevel = 1+floor/2;
                             maxEnemyHealth = 100+(plyLevel)+(eneLevel*2);
                             curenemyHealth = rand.nextInt(maxEnemyHealth);
@@ -319,30 +420,47 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 
                 //SANS?! ENCOUNTER DATA
             if(bossEnemy.equals("SANS?!")){
-                Boss = true;
-                  eneLevel = 1;
-                  curenemyHealth = SansHealth;
-                  enemyHealth = enemyHealth - enemyHealth + SansHealth;  
-                  enemyAttackDamage = enemyAttackDamage + SansAtkDmg;
-                  enemyEva = enemyEva + SansEva;
-                  enemyHit = enemyHit + SansHit;
-                  
-                  maxEnemyHealth = maxEnemyHealth - maxEnemyHealth + 1;
-                  bonusMoney = 3000;
+                SansFight = true;
+                
+                enemy = bossEnemy;
+                
+                audioP.stopSoundloop();
+                audioP.playSoundloop(3);
+                
+                eneLevel = 1;
+                curenemyHealth = SansHealth;
+                enemyHealth = enemyHealth - enemyHealth + SansHealth;  
+                enemyAttackDamage = SansAtkDmg;
+                enemyEva = enemyEva + SansEva;
+                enemyHit = enemyHit + SansHit;
+                
+                if(SansStamina<=0){
+                    SansStamina = 0;
+                    enemyEva = enemyEva - 500;
+                }
+                
+                maxEnemyHealth = maxEnemyHealth - maxEnemyHealth + 1;
+                bonusMoney = 3000;
                 } 
             
             //SPECIAL CHAD ELF ENCOUNTER DATA
             else if(bossEnemy.equals("Brother Fan the Chad Elf")){
                 Boss = true;
-                  eneLevel = 70;
-                  curenemyHealth = ChadHealth;
-                  enemyHealth = enemyHealth - enemyHealth + ChadHealth;  
-                  enemyAttackDamage = enemyAttackDamage + ChadAtkDmg;
-                  enemyEva = enemyEva + ChadEva;
-                  enemyHit = enemyHit + ChadHit;
-                  
-                  maxEnemyHealth = maxEnemyHealth - maxEnemyHealth + 1000;
-                  bonusMoney = 3000;
+                
+                enemy = bossEnemy;
+                
+                audioP.stopSoundloop();
+                audioP.playSoundloop(2);
+                
+                eneLevel = 70;
+                curenemyHealth = ChadHealth;
+                enemyHealth = enemyHealth - enemyHealth + ChadHealth;  
+                enemyAttackDamage = enemyAttackDamage + ChadAtkDmg;
+                enemyEva = enemyEva + ChadEva;
+                enemyHit = enemyHit + ChadHit;
+
+                maxEnemyHealth = maxEnemyHealth - maxEnemyHealth + 1000;
+                bonusMoney = 3000;
                   
                 }
             }
@@ -386,12 +504,15 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 }
               
                 System.out.println("------------------------------------");
-                System.out.println("\tYour HP: " +health);
+                System.out.println("\t"+myName +"'s HP: "+health);
                 System.out.println("\t" +enemy +"'s HP: " +enemyHealth);
+                if(bossEnemy=="SANS?!") {
+                    System.out.println("\t" +enemy +"'s STAMINA: " +SansStamina);
+                }
                 System.out.println("\n\tWhat would you like to do?");
                 System.out.println("\t1. Fight");
                 System.out.println("\t1a. Analyze Situation");
-                System.out.println("\t2. Inventory");
+                System.out.println("\t2. Inventory (WIP)");
                 System.out.println("\t3. Run");
                 System.out.println("------------------------------------");
                 
@@ -414,6 +535,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 
                 
                 if (input.equals("1")) {                                        // FIGHT
+                    
+                    audioP.stopSound();
+                    audioP.playSound(2);
+                    
                     //SCREEN JUMP TO CLEAN
                     
                     
@@ -445,7 +570,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     String inpAtk = in.nextLine();
                     
                     if(inpAtk.equals("1")){
-                         
+                        
+                        audioP.stopSound();
+                        audioP.playSound(3);
+                        
                         if(eneRandEva >= possEnemyNotGetHit) {
                         eneRandEva = possEnemyNotGetHit;
                         
@@ -462,6 +590,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         df2.setRoundingMode(RoundingMode.UP);
                         System.out.println("\n\n\n\n\n\n\n\n\n\n");
                         System.out.println("\t> Your attack missed the enemy!");
+                        
+                        if(bossEnemy=="SANS?!"){
+                            SansStamina = SansStamina -10;
+                        }
+                        
                        // System.out.println("\t> The enemy evaded the attack!");System.out.println("(debug) chance : " +df2.format(eneRandEva));
                         }
                        //Evasion randomizer or chance
@@ -486,6 +619,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                        
                         
                   } else if(inpAtk.equals("2")){
+                      
+                        audioP.stopSound();
+                        audioP.playSound(4);
+                      
                       chargebnsdmg = true;
                       System.out.println("------------------------------------");
                       System.out.println("\t> You charge up power inside.");
@@ -495,17 +632,28 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                       boolean charged = true;
                        
                       
-                      chargeDmg =(int) ((attackDamage * charge) - attackDamage)/2;
+                      chargeDmg =(int) ((attackDamage * charge))/2;
                       
                       cDmgNum = Integer.toString(chargeDmg);
                       
                       addedDamage = " +("+cDmgNum+")";
                       System.out.println("\t> You charged up +"+(chargeDmg)+" max damage!");
                       
+                    try
+                    {
+                    TimeUnit.MILLISECONDS.sleep((100));
+                    }
+                    catch (Exception ex) {
+
+                    }  
+                      
                       //Evasion randomizer or chance
                     plyRandEva = (double)(Math.random()) + plyMin; //double math random is going to roll random number from 0-1, but since it's multiplied by plyrange, which is -> 
                     if(plyRandEva >= possPlyNotGetHit) {
                         plyRandEva = possPlyNotGetHit;
+                        
+                        audioP.stopSound();
+                        audioP.playSound(3);
                         
                         health -= damageTaken;
                         System.out.println("\t> The " +enemy +" hits you!");
@@ -523,8 +671,14 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     }
                     
                   } else if(inpAtk.equals("3")){
+                      
+                      
+                      if(charge>=1) {
+                      audioP.stopSound();
+                      audioP.playSound(3);
+                                           
                       chargebnsdmg = false;
-                      charge = 1;
+                      //charge = 1;
                       boolean charged = false;
                       if(eneRandEva >= possEnemyNotGetHit) {
                         eneRandEva = possEnemyNotGetHit;
@@ -561,8 +715,11 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                        // System.out.println("\t> You evaded the "+enemy +"'s attack!"); System.out.println("(debug) chance : "+df2.format(plyRandEva));
                         //You evaded!
                     }
-                   } 
-                      
+                    } 
+                    } else {
+                          System.out.println("------------------------------------");
+                          System.out.println("\t You haven't charged up power!.");
+                      }   
                   }
                     
                     
@@ -578,7 +735,17 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     System.out.println("");
                   
                     if(health<1) {
-                        System.out.println("\t You have taken too much damage. You are too weak to go on.");
+                        System.out.println("You have taken too much damage. You are too weak to go on.");
+                        
+                        audioP.stopSound();
+                        audioP.playSound(8);
+                        try{
+                        TimeUnit.SECONDS.sleep(2);
+                        } catch (Exception ex) {
+                            
+                        }
+                        break;
+                        
                         
                         
                     }
@@ -586,6 +753,8 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 else if (input.equals("1a")) {                                  // ANALYZE SITUATION
                     //SCREEN JUMP TO CLEAN
                     
+                    audioP.stopSound();
+                    audioP.playSound(2);
                     //String addedDamage = (cDmgNum);
                     
                     System.out.println("\n\n\n\n\n\n\n\n\n\n");
@@ -594,11 +763,15 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     System.out.println("############################################################");
                     System.out.println("                        ANALYZE                             ");
                     System.out.println("############################################################");
-                    if(SansFight==true){
-                        String[] SansDialogues = {"\t*You feel your sins crawling behind you", "\t*You feel like you're going to have a bad time", "\t*You felt your sins weighing on your neck"
-                          ,"\t*The easiest enemy. Can only deal 1 damage."};
+                    if(bossEnemy=="SANS?!"){
+                        String[] SansDialogues = {"\t*You feel your sins crawling near your behind.", "\t*You are having a bad time", "\t*You felt your sins weighing on your neck, also your shoulders feel stiff."
+                          ,"\t*The easiest enemy. Can only deal 1 damage. But dodges\n\t amost all your attacks so not really."};
                         String SansSystem = SansDialogues[rand.nextInt(SansDialogues.length)];
                         System.out.println(SansSystem);
+                    } else if(bossEnemy=="Brother Fan the chad elf") {
+                        String[] FanDialogues = {"\t*His bulge feels intimidating.", "\t*His presence shooks your entire being."};
+                        String FanSystem = FanDialogues[rand.nextInt(FanDialogues.length)];
+                        System.out.println(FanSystem);
                     }
                     
                     if(chargebnsdmg!=true) {
@@ -636,6 +809,9 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     
                 }
                 else if (input.equals("2")) {                                   // DRINK HP POTION --> TO BE INVENTORY
+                    
+                    audioP.stopSound();
+                    audioP.playSound(2);
                     //SCREEN JUMP TO CLEAN
                     System.out.println("\n\n\n\n\n\n\n\n\n\n");
                     System.out.println("------------------------------------");
@@ -656,10 +832,16 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     System.out.println("Use :");
                     String input2 = in.nextLine();
                     if(input2.equals("0")){
+                        audioP.stopSound();
+                        audioP.playSound(2);
                         invOpen = false;
                     }
                     
                     if(input2.equals("1")){
+                        
+                        audioP.stopSound();
+                        audioP.playSound(2);
+                        
                         while(health==maxHealth) {
                             numHealthPots = numHealthPots - 0;
                             System.out.println("\t> Your health is already full!");
@@ -675,6 +857,8 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                             health = maxHealth;
                          }
                         
+                        audioP.stopSound();
+                        audioP.playSound(10);
                         
                         System.out.println("\n\n\n\n\n\n\n\n\n\n"+"\t> You drink a health potion, healing yourself for " +healthPotionHealAmount 
                                             +"\n\t> You now have " +health + "HP"
@@ -688,22 +872,30 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                     }
                 }
                 else if (input.equals("3")) {                                   // RUN 
+                    audioP.stopSound();
+                    audioP.playSound(5);
                     //SCREEN JUMP TO CLEAN
                     System.out.println("\n\n\n\n\n\n\n\n\n\n");
                     System.out.println("------------------------------------");
                     
                     System.out.println("\t> You run away from the " +enemy +"!");
+                    SansFight = false;
                     continue GAME;
                 }   
                 else {
+                    System.out.println("\n\n\n\n\n\n\n\n\n\n");
                     System.out.println("\tInvalid Command");
                 }
             } //while(enemyhealth > 0) END
            
+            SansFight = false;
             //call art if depth 13
             
             
             if(health<1){
+                
+                
+                
                 System.out.println("");
                 System.out.println("You limp out of the dungeon, weak from battle");
                 break;
@@ -714,6 +906,9 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
             XP = XP + MonXP;
                                 
             for(nextlvXP = nextlvXP;nextlvXP<=XP;plyLevel++){
+                
+                audioP.stopSound();
+                audioP.playSound(11);
                 
                 maxHealth = maxHealth + 2;
                 attackDamage = attackDamage +5;
@@ -735,6 +930,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 
                 
             } if(XP<=nextlvXP){
+                
+                audioP.stopSound();
+                audioP.playSound(9);
+                
                 displayXP = displayXP+MonXP;
                 double nextlvxp = nextlvXP - XP;
                 System.out.println("\n");
@@ -796,18 +995,14 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                                 
             }
            
-            if(depth==28){
-                System.out.println("\n\nTHANK YOU FOR PLAYING THE DARKRPG ALPHA DEMO!!!");
-                System.out.println("");
-                running = false;
-            }
+            
             BACK:
             System.out.println("------------------------------------");
             System.out.println("What would you like to do?");
             System.out.println("1. Continue Fighting");
             System.out.println("2. Exit Dungeon?");
-            System.out.println("3. Shop");
-            System.out.println("4. Save & Continue Fighting");
+            System.out.println("3. Shop & Continue Fighting (WIP)");
+            System.out.println("4. Save & Continue Fighting (WIP)");
             System.out.println("------------------------------------");
             
             String input = in.nextLine();
@@ -818,6 +1013,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
         }
             
             if(input.equals("1")) {                                             //CONTINUE VENTURES
+                
+                audioP.stopSound();
+                audioP.playSound(2);
+                
                 depth = depth +1;                                             // DEPTH & FLOOR
                             System.out.println("\n\n\n\n\n\n\n\n\n\n");
                             System.out.println("\t*********************************");
@@ -847,10 +1046,18 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                continue;
             }
             else if(input.equals("2")) {                                        //STOP GAME
+                
+                audioP.stopSound();
+                audioP.playSound(2);
+                
                 System.out.println("You emerged from the dungeon.");
                 break;
             }
             else if(input.equals("3")) {                                        //SHOP
+                
+                audioP.stopSound();
+                audioP.playSound(2);
+                
                 boolean shop = true;
                 SHOP:
                 while(shop) {
@@ -861,8 +1068,8 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 System.out.println("Money :" +money +" Coins");
                 System.out.println("1. +1 Min damage & +3 Max Damage, 50 coins "
                         +"\n2. +1 Potion, 25 coins" 
-                        +"\n3. +100 Health, 75 coins" 
-                        +"\n4. Weapons & Armor"
+                        +"\n3. +25 Health, 80 coins" 
+                        +"\n4. Weapons & Armor (HEAVY WIP)"
                         +"\n5. Continue Journey");
                 
                 System.out.println("---------------------------------");
@@ -886,6 +1093,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         System.out.println("You don't have enough money.");
                         continue;
                     } else {
+                        
+                        audioP.stopSound();
+                audioP.playSound(2);
+                        
                         attackDamage = attackDamage + 3;
                         mindamage = mindamage +1;
                         System.out.println("You upgraded your min damage by 1 & max damage by 3! now your damage is " +(mindamage+equipadddamage)+"-"+(attackDamage+equipadddamage) +"!" +"\nYou have " +money +" Coins left!");
@@ -901,6 +1112,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         System.out.println("You don't have enough money.");
                         continue;
                     } else {
+                        
+                        audioP.stopSound();
+                audioP.playSound(2);
+                        
                     numHealthPots = numHealthPots + 1;
                     System.out.println("You bought 1 potion! now you carry " +numHealthPots +" potions in your inventory!");
                     money = money - 25;
@@ -913,13 +1128,21 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                         System.out.println("You don't have enough money.");
                         continue;
                     } else {
-                    maxHealth = maxHealth + 100;    
-                    System.out.println("You added 100 max health! now your health is " +health +" points!");
+                        
+                        audioP.stopSound();
+                audioP.playSound(2);
+                        
+                    maxHealth = maxHealth + 25;    
+                    System.out.println("You added 25 max health! now your health is " +health +" points!");
                     money = money - 80;
                     
                     }
                   }
                 else if(inputShop.equals("4")) {
+                    
+                    audioP.stopSound();
+                audioP.playSound(2);
+                    
                     boolean armory = true;
                     System.out.println("---------------------------------\n1. Weaponry "
                         +"\n2. Armors "
@@ -941,6 +1164,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 boolean sw5b = false;
                 
                 if(inputArmory.equals("1")) {
+                    
+                    audioP.stopSound();
+                audioP.playSound(2);
+                    
                     System.out.println("---------------------------------");
                     System.out.println("1."+sw1 + " 1 coins");
                     System.out.println("2."+sw2);
@@ -977,6 +1204,10 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                             }
                         }
                         else if(yn.equals("N")) {
+                            
+                            audioP.stopSound();
+                audioP.playSound(2);
+                            
                             continue;
                         }
                     }
@@ -998,14 +1229,22 @@ private static DecimalFormat df2 = new DecimalFormat(".##");
                 
                }   
                  else if(inputShop.equals("5")) {
+                     
+                     audioP.stopSound();
+                audioP.playSound(2);
+                     
                     continue GAME;
                 }
             
             
             }
                 
-            }           
+            }
+            
             else if(input.equals("4")) {
+                
+                audioP.stopSound();
+                audioP.playSound(6);
                 
                 System.out.println("\n\n\n\n\n\n\n\n\n\n");  
                 System.out.println("##########################\nYou saved your progress!\n##########################");
